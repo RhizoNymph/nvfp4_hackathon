@@ -60,7 +60,7 @@ echo ""
 ncu -o "$NCU_REP" \
     --log-file "$NCU_LOG" \
     --set full \
-    python profile_kernel.py $EXTRA_ARGS 2>&1 | tee "$ALL_OUTPUT"
+    uv run python profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$ALL_OUTPUT"
 
 echo ""
 echo "Profiling complete!"
