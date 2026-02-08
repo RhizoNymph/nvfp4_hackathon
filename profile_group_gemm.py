@@ -1,29 +1,38 @@
 #!/usr/bin/env python3
 """
-Profiling script for NVFP4 Group GEMM kernel with NCU.
+Profiling script for NVFP4 Group GEMM kernel with NCU and Nsight Systems.
 This script runs the kernel once with minimal overhead for profiling.
 
 Usage:
-    # Basic profiling of reference kernel
-    python profile_kernel.py
+    # Profile with both NCU and Nsight Systems (default)
+    ./profile_group_gemm.sh
+
+    # Profile with only Nsight Compute
+    ./profile_group_gemm.sh --profiler ncu
+
+    # Profile with only Nsight Systems
+    ./profile_group_gemm.sh --profiler nsys
 
     # Profile submission kernel instead
-    python profile_kernel.py --submission
+    ./profile_group_gemm.sh --submission
 
-    # Basic NCU profiling (text output)
-    ncu python profile_kernel.py
+    # Basic NCU profiling (text output) - filter to only CUTLASS kernels
+    ncu --kernel-name regex:"cutlass.*" python profile_group_gemm.py
 
     # Full metrics with GUI-exportable report
-    ncu --set full -o profile_report python profile_kernel.py
+    ncu --set full --kernel-name regex:"cutlass.*" -o profile_report python profile_group_gemm.py
 
-    # Specific metrics for memory/compute analysis
-    ncu --metrics sm__throughput.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed python profile_kernel.py
+    # Nsight Systems profiling (timeline view)
+    nsys profile -t cuda,nvtx -o profile_report python profile_group_gemm.py
+
+    # Specific NCU metrics for memory/compute analysis
+    ncu --kernel-name regex:"cutlass.*" --metrics sm__throughput.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed python profile_group_gemm.py
 
     # Profile specific benchmark case
-    python profile_kernel.py --case 0
+    python profile_group_gemm.py --case 0
 
     # Profile with custom problem sizes
-    python profile_kernel.py --m 128,256 --n 4096,4096 --k 7168,7168 --g 2
+    python profile_group_gemm.py --m 128,256 --n 4096,4096 --k 7168,7168 --g 2
 """
 import sys
 import argparse
