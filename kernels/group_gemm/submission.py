@@ -664,7 +664,7 @@ def kernel(
     # Deallocate TMEM
     cute.arch.barrier()
     if warp_idx == EPILOG_WARPS[0]:
-        tmem.free(acc_tmem_ptr)
+            cute.arch.dealloc_tmem(acc_tmem_ptr, num_tmem_alloc_cols)
     pass
 
 
