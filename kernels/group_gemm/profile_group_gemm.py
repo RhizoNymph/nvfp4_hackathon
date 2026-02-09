@@ -126,9 +126,20 @@ def profile_kernel(test_case: dict, warmup_runs: int = 2, use_submission: bool =
 
     # Generate input
     print("Generating input data...", flush=True)
+    torch.cuda.reset_peak_memory_stats()
+    mem_before = torch.cuda.memory_allocated()
     data = generate_input(m=m_list, n=n_list, k=k_list, g=g, seed=seed)
     torch.cuda.synchronize()
-    print("Input generation complete.")
+    mem_after = torch.cuda.memory_allocated()
+    mem_delta = mem_after - mem_before
+    print(f"Input generation complete. GPU memory: {mem_delta / 1e6:.1f} MB allocated ({mem_after / 1e6:.1f} MB total)")
+
+    abc_tensors, sfasfb_tensors, sfasfb_reordered_tensors, problem_sizes = data
+    print(f"  Problem sizes: {problem_sizes}")
+    for i, (a, b, c) in enumerate(abc_tensors):
+        print(f"  Group {i}: A {tuple(a.shape)} {a.dtype}, B {tuple(b.shape)} {b.dtype}, C {tuple(c.shape)} {c.dtype}")
+    for i, (sfa, sfb) in enumerate(sfasfb_tensors):
+        print(f"  Group {i} scale factors: SFA {tuple(sfa.shape)} {sfa.dtype}, SFB {tuple(sfb.shape)} {sfb.dtype}")
     print()
 
     # Clone function for data
@@ -152,9 +163,15 @@ def profile_kernel(test_case: dict, warmup_runs: int = 2, use_submission: bool =
     if warmup_runs > 0:
         print(f"Running {warmup_runs} warmup iteration(s)...", flush=True)
         for i in range(warmup_runs):
+            start_event = torch.cuda.Event(enable_timing=True)
+            end_event = torch.cuda.Event(enable_timing=True)
             data_clone = clone_data(data)
+            start_event.record()
             _ = kernel_fn(data_clone)
+            end_event.record()
             torch.cuda.synchronize()
+            elapsed_ms = start_event.elapsed_time(end_event)
+            print(f"  Warmup {i+1}/{warmup_runs}: {elapsed_ms:.3f} ms", flush=True)
         print("Warmup complete.")
         print()
 
@@ -203,12 +220,26 @@ def run_benchmark_timing(test_case: dict, num_runs: int = 10, use_submission: bo
 
     print(f"Benchmarking: {name} ({kernel_name})")
     print(f"Groups: {g}")
+    for i in range(g):
+        print(f"  Group {i}: M={m_list[i]}, N={n_list[i]}, K={k_list[i]}")
 
     total_flops = calculate_flops(m_list, n_list, k_list)
+    print(f"Total FLOPs: {total_flops / 1e9:.2f} GFLOPs")
 
     # Generate input
+    print("Generating input data...", flush=True)
+    torch.cuda.reset_peak_memory_stats()
+    mem_before = torch.cuda.memory_allocated()
     data = generate_input(m=m_list, n=n_list, k=k_list, g=g, seed=seed)
     torch.cuda.synchronize()
+    mem_after = torch.cuda.memory_allocated()
+    print(f"Input generation complete. GPU memory: {(mem_after - mem_before) / 1e6:.1f} MB allocated ({mem_after / 1e6:.1f} MB total)")
+
+    abc_tensors, sfasfb_tensors, sfasfb_reordered_tensors, problem_sizes = data
+    print(f"  Problem sizes: {problem_sizes}")
+    for i, (a, b, c) in enumerate(abc_tensors):
+        print(f"  Group {i}: A {tuple(a.shape)} {a.dtype}, B {tuple(b.shape)} {b.dtype}, C {tuple(c.shape)} {c.dtype}")
+    print()
 
     def clone_data(data):
         abc_tensors, sfasfb_tensors, sfasfb_reordered_tensors, problem_sizes = data
@@ -227,13 +258,23 @@ def run_benchmark_timing(test_case: dict, num_runs: int = 10, use_submission: bo
         return (cloned_abc, cloned_sfasfb, cloned_sfasfb_reordered, problem_sizes)
 
     # Warmup
-    for _ in range(3):
+    warmup_count = 3
+    print(f"Running {warmup_count} warmup iteration(s)...", flush=True)
+    for i in range(warmup_count):
+        ws = torch.cuda.Event(enable_timing=True)
+        we = torch.cuda.Event(enable_timing=True)
+        ws.record()
         _ = kernel_fn(clone_data(data))
+        we.record()
         torch.cuda.synchronize()
+        print(f"  Warmup {i+1}/{warmup_count}: {ws.elapsed_time(we):.3f} ms", flush=True)
+    print("Warmup complete.")
+    print()
 
     # Timing runs
+    print(f"Running {num_runs} benchmark iteration(s)...", flush=True)
     times_ms = []
-    for _ in range(num_runs):
+    for i in range(num_runs):
         clear_l2_cache()
         data_clone = clone_data(data)
 
@@ -247,15 +288,22 @@ def run_benchmark_timing(test_case: dict, num_runs: int = 10, use_submission: bo
         torch.cuda.synchronize()
         elapsed_ms = start_event.elapsed_time(end_event)
         times_ms.append(elapsed_ms)
+        iter_tflops = total_flops / (elapsed_ms / 1000) / 1e12
+        print(f"  Run {i+1}/{num_runs}: {elapsed_ms:.3f} ms ({iter_tflops:.2f} TFLOPS)", flush=True)
 
     avg_ms = sum(times_ms) / len(times_ms)
     min_ms = min(times_ms)
     max_ms = max(times_ms)
+    std_ms = (sum((t - avg_ms) ** 2 for t in times_ms) / len(times_ms)) ** 0.5
 
     tflops = total_flops / (avg_ms / 1000) / 1e12
+    peak_tflops = total_flops / (min_ms / 1000) / 1e12
 
-    print(f"  Time: {avg_ms:.3f} ms (min: {min_ms:.3f}, max: {max_ms:.3f})")
-    print(f"  TFLOPS: {tflops:.2f}")
+    print()
+    print(f"  Avg:  {avg_ms:.3f} ms  ({tflops:.2f} TFLOPS)")
+    print(f"  Min:  {min_ms:.3f} ms  ({peak_tflops:.2f} TFLOPS)")
+    print(f"  Max:  {max_ms:.3f} ms")
+    print(f"  Std:  {std_ms:.3f} ms  ({std_ms/avg_ms*100:.1f}% CV)")
     print()
 
     return avg_ms, tflops
