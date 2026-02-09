@@ -1,0 +1,6 @@
+==PROF== Connected to process 3474 (/usr/bin/python3.10)
+==PROF== Profiling "kernel_cutlass_kernel_TiledMMA_ThrLayoutVMNK11110000_PermutationMNK____MMAAtom_ThrID10_ShapeMNK12812864_TVLayoutA1128641281128_TVLayoutB1128641281128_TVLayoutC11281281281128_CopyAtom_ThrI_0": 0%....50%....100% - 39 passes
+==PROF== Profiling "kernel_cutlass_kernel_TiledMMA_ThrLayoutVMNK11110000_PermutationMNK____MMAAtom_ThrID10_ShapeMNK12812864_TVLayoutA1128641281128_TVLayoutB1128641281128_TVLayoutC11281281281128_CopyAtom_ThrI_0": 0%....50%....100% - 39 passes
+==PROF== Profiling "kernel_cutlass_kernel_TiledMMA_ThrLayoutVMNK11110000_PermutationMNK____MMAAtom_ThrID10_ShapeMNK12812864_TVLayoutA1128641281128_TVLayoutB1128641281128_TVLayoutC11281281281128_CopyAtom_ThrI_0": 0%....50%....100% - 39 passes
+==PROF== Disconnected from process 3474
+==PROF== Report: /root/reference-kernels/problems/nvidia/nvfp4_group_gemm/profiles/submission_case0_ncu_20260208_220302.ncu-rep

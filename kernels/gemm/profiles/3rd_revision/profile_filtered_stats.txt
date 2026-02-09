@@ -1,0 +1,157 @@
+NCU AGGREGATED PERFORMANCE SUMMARY (Averaged over all kernels)
+================================================================================
+
+RANKED BOTTLENECKS (Highest Potential Speedup First):
+Section Name                                       | Avg. Speedup % 
+----------------------------------------------------------------------
+Compute Workload Analysis                          |         95.01%
+Source Counters                                    |         84.09%
+Scheduler Statistics                               |         81.64%
+Occupancy                                          |         81.64%
+Warp State Statistics                              |         73.01%
+Launch Statistics                                  |         67.57%
+GPU and Memory Workload Distribution               |         19.04%
+Memory Workload Analysis Tables                    |         17.21%
+Memory Workload Analysis Chart                     |          4.32%
+
+================================================================================
+
+### Section: Compute Workload Analysis
+--------------------------------------------- ----------- ------------
+Executed Ipc Active                                       0.08        
+Executed Ipc Elapsed                                      0.03        
+Issue Slots Busy                                          0.59        
+Issued Ipc Active                                         0.08        
+SM Busy                                                   4.99        
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 95.01%
+================================================================================
+
+### Section: GPU Speed Of Light Throughput
+--------------------------------------------- ----------- ------------
+Compute (SM) Throughput                                   5.47        
+DRAM Frequency                                            3989682952.54
+DRAM Throughput                                           6.57        
+Duration                                                  62528.00    
+Elapsed Cycles                                            71952.00    
+L1/TEX Cache Throughput                                   66.68       
+L2 Cache Throughput                                       14.37       
+Memory Throughput                                         18.36       
+SM Active Cycles                                          20897.87    
+SM Frequency                                              1141537610.06
+================================================================================
+
+### Section: GPU and Memory Workload Distribution
+--------------------------------------------- ----------- ------------
+Average DRAM Active Cycles                                15186.21    
+Average L1 Active Cycles                                  20897.87    
+Average L2 Active Cycles                                  65088.43    
+Average SM Active Cycles                                  20897.87    
+Average SMSP Active Cycles                                20815.57    
+Total DRAM Elapsed Cycles                                 15967232.00 
+Total L1 Elapsed Cycles                                   10691762.00 
+Total L2 Elapsed Cycles                                   13274281.33 
+Total SM Elapsed Cycles                                   10691762.00 
+Total SMSP Elapsed Cycles                                 42767048.00 
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 19.04%
+
+Advice & Analysis (Averaged Trends):
+ - One or more SMSPs have a much lower number of active cycles than the average number of active cycles. Maximum instance value is 69.54% above the average, while the minimum instance value is 100.00% below the average.
+
+ - One or more SMs have a much lower number of active cycles than the average number of active cycles. Maximum instance value is 69.37% above the average, while the minimum instance value is 100.00% below the average.
+
+================================================================================
+
+### Section: Instruction Statistics
+--------------------------------------------- ----------- ------------
+Avg. Executed Instructions Per Scheduler                  464.07      
+Avg. Issued Instructions Per Scheduler                    464.50      
+Executed Instructions                                     274733.33   
+Issued Instructions                                       274981.33   
+================================================================================
+
+### Section: Launch Statistics
+--------------------------------------------- ----------- ------------
+# SMs                                                     148.00      
+# TPCs                                                    74.00       
+Block Size                                                128.00      
+Driver Shared Memory Per Block                            1024.00     
+Dynamic Shared Memory Per Block                           184448.00   
+Grid Size                                                 48.00       
+Preferred Cluster Size                                    0.00        
+Registers Per Thread                                      136.00      
+Shared Memory Configuration Size                          200704.00   
+Stack Size                                                1024.00     
+Static Shared Memory Per Block                            0.00        
+Threads                                                   6144.00     
+Uses Green Context                                        0.00        
+Waves Per SM                                              0.33        
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 67.57%
+================================================================================
+
+### Section: Memory Workload Analysis
+--------------------------------------------- ----------- ------------
+L1/TEX Hit Rate                                           98.44       
+L2 Compression Input Sectors                              787897.00   
+L2 Compression Ratio                                      0.00        
+L2 Compression Success Rate                               0.00        
+L2 Hit Rate                                               41.22       
+Local Memory Spilling Request Overhead                    0.00        
+Local Memory Spilling Requests                            0.00        
+Max Bandwidth                                             18.36       
+Mem Busy                                                  12.56       
+Mem Pipes Busy                                            4.91        
+Memory Throughput                                         436582223262.71
+================================================================================
+
+### Section: Occupancy
+--------------------------------------------- ----------- ------------
+Achieved Active Warps Per SM                              3.99        
+Achieved Occupancy                                        6.23        
+Block Limit Registers                         block       3.00        
+Block Limit SM                                block       32.00       
+Block Limit Shared Mem                        block       1.00        
+Block Limit Warps                             block       16.00       
+Theoretical Active Warps per SM               warp        4.00        
+Theoretical Occupancy                                     6.25        
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 81.64%
+================================================================================
+
+### Section: Scheduler Statistics
+--------------------------------------------- ----------- ------------
+Active Warps Per Scheduler                                1.00        
+Eligible Warps Per Scheduler                              0.02        
+Issued Warp Per Scheduler                                 0.02        
+No Eligible                                               97.86       
+One or More Eligible                                      2.14        
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 81.64%
+================================================================================
+
+### Section: Source Counters
+--------------------------------------------- ----------- ------------
+Avg. Divergent Branches                                   0.08        
+Branch Efficiency                                         99.49       
+Branch Instructions                                       10451.33    
+Branch Instructions Ratio                                 0.04        
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 84.09%
+================================================================================
+
+### Section: Warp State Statistics
+--------------------------------------------- ----------- ------------
+Avg. Active Threads Per Warp                              31.81       
+Avg. Not Predicated Off Threads Per Warp                  30.65       
+Warp Cycles Per Executed Instruction                      51.94       
+Warp Cycles Per Issued Instruction                        51.90       
+
+>> GLOBAL AVERAGE ESTIMATED SPEEDUP: 73.01%
+
+Advice & Analysis (Averaged Trends):
+ - On average, each warp of this workload spends 37.67 cycles being stalled waiting for a scoreboard dependency on a L1.00TEX (local, global, surface, texture) operation. Find the instruction producing the data being waited upon to identify the culprit. To reduce the number of cycles waiting on L1.00TEX data accesses verify the memory access patterns are optimal for the target architecture, attempt to increase cache hit rates by increasing data locality (coalescing), or by changing the cache configuration. Consider moving frequently used data to shared memory. This stall type represents about 73.00% of the total average of 51.87 cycles between issuing two instructions.
+
+================================================================================
+

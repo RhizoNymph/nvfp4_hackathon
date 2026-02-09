@@ -13,3 +13,7 @@ docs
 examples
 
 .env
+
+*.ncu-rep
+*.nsys-rep
+*.sqlite

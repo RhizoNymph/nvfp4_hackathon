@@ -1,0 +1,34 @@
+============================================================
+NVFP4 Group GEMM Kernel Profiler
+============================================================
+Device: NVIDIA B200
+CUDA Version: 12.8
+
+Profiling: 8 groups, small M, large N/K
+Groups: 8
+Problem sizes:
+  Group 0: M=80, N=4096, K=7168
+  Group 1: M=176, N=4096, K=7168
+  Group 2: M=128, N=4096, K=7168
+  Group 3: M=72, N=4096, K=7168
+  Group 4: M=64, N=4096, K=7168
+  Group 5: M=248, N=4096, K=7168
+  Group 6: M=96, N=4096, K=7168
+  Group 7: M=160, N=4096, K=7168
+Total FLOPs: 60.13 GFLOPs
+
+Using SUBMISSION kernel
+
+Generating input data...
+Input generation complete.
+
+Running 2 warmup iteration(s)...
+Warmup complete.
+
+==================================================
+RUNNING PROFILED KERNEL CALL (submission)
+==================================================
+Kernel execution complete.
+==================================================
+
+Done!

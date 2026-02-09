@@ -1,0 +1,736 @@
+[1395917] python3.10@127.0.0.1
+  kernel_cutlass_kernel_TiledMMA_ThrLayoutVMNK11110000_PermutationMNK____MMAAtom_ThrID10_ShapeMNK12812864_TVLayoutA1128641281128_TVLayoutB1128641281128_TVLayoutC11281281281128_CopyAtom_ThrI_0 (1, 56, 1)x(128, 1, 1), Context 1, Stream 7, Device 0, CC 10.0
+
+    NVTX Push/Pop Stack for Thread 1395917:
+     <default domain>
+        <0,custom_kernel>
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ----------------
+    Metric Name             Metric Unit     Metric Value
+    ----------------------- ----------- ----------------
+    DRAM Frequency                      3,990,785,498.49
+    SM Frequency                        1,142,912,103.47
+    Elapsed Cycles                                60,876
+    Memory Throughput                              21.22
+    DRAM Throughput                                 2.39
+    Duration                                      52,960
+    L1/TEX Cache Throughput                        66.16
+    L2 Cache Throughput                            17.24
+    SM Active Cycles                           19,402.13
+    Compute (SM) Throughput                         3.19
+    ----------------------- ----------- ----------------
+
+    OPT   This kernel grid is too small to fill the available resources on this device, resulting in only 0.4 full      
+          waves across all SMs. Look at Launch Statistics for more details.                                             
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU Speed Of Light Roofline Chart
+    INF   The ratio of peak float (FP32) to double (FP64) performance on this device is 2:1. The workload achieved 0%   
+          of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide           
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline      
+          analysis.                                                                                                     
+
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Compute Workload Analysis
+    -------------------- ----------- ------------
+    Metric Name          Metric Unit Metric Value
+    -------------------- ----------- ------------
+    Executed Ipc Active                      0.05
+    Executed Ipc Elapsed                     0.02
+    Issue Slots Busy                         0.42
+    Issued Ipc Active                        0.05
+    SM Busy                                  1.75
+    -------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 98.25%                                                                                     
+          All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps 
+          per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.             
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis
+    -------------------------------------- ----------- ------------------
+    Metric Name                            Metric Unit       Metric Value
+    -------------------------------------- ----------- ------------------
+    Local Memory Spilling Requests                                      0
+    Local Memory Spilling Request Overhead                              0
+    Memory Throughput                                  159,047,734,138.97
+    Mem Busy                                                        14.32
+    Max Bandwidth                                                   21.22
+    L1/TEX Hit Rate                                                 98.44
+    L2 Compression Success Rate                                         0
+    L2 Compression Ratio                                                0
+    L2 Compression Input Sectors                                  918,789
+    L2 Hit Rate                                                     52.53
+    Mem Pipes Busy                                                   3.19
+    -------------------------------------- ----------- ------------------
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis Chart
+    OPT   Estimated Speedup: 1.068%                                                                                     
+          Out of the 29401248.0 bytes sent to the L2 Compression unit only 0.00% were successfully compressed. To       
+          increase this success rate, consider marking only those memory regions as compressible that contain the most  
+          zero values and/or expose the most homogeneous values.                                                        
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis Tables
+    OPT   Estimated Speedup: 19.89%                                                                                     
+          The memory access pattern for global stores to L1TEX might not be optimal. On average, only 2.0 of the 32     
+          bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between   
+          threads. Check the Source Counters section for uncoalesced global stores.                                     
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Scheduler Statistics
+    ---------------------------- ----------- ------------
+    Metric Name                  Metric Unit Metric Value
+    ---------------------------- ----------- ------------
+    One or More Eligible                             1.30
+    Issued Warp Per Scheduler                        0.01
+    No Eligible                                     98.70
+    Active Warps Per Scheduler                       1.00
+    Eligible Warps Per Scheduler                     0.01
+    ---------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 78.78%                                                                                     
+          Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only    
+          issues an instruction every 76.9 cycles. This might leave hardware resources underutilized and may lead to    
+          less optimal performance. Out of the maximum of 16 warps per scheduler, this workload allocates an average    
+          of 1.00 active warps per scheduler, which already limits the scheduler to less than a warp per instruction.   
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Warp State Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Warp Cycles Per Issued Instruction                          76.66
+    Warp Cycles Per Executed Instruction                        76.69
+    Avg. Active Threads Per Warp                                31.68
+    Avg. Not Predicated Off Threads Per Warp                    30.51
+    ---------------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 71.66%                                                                                     
+          On average, each warp of this workload spends 54.9 cycles being stalled waiting for a scoreboard dependency   
+          on a L1TEX (local, global, surface, texture) operation. Find the instruction producing the data being waited  
+          upon to identify the culprit. To reduce the number of cycles waiting on L1TEX data accesses verify the        
+          memory access patterns are optimal for the target architecture, attempt to increase cache hit rates by        
+          increasing data locality (coalescing), or by changing the cache configuration. Consider moving frequently     
+          used data to shared memory. This stall type represents about 71.7% of the total average of 76.7 cycles        
+          between issuing two instructions.                                                                             
+    ----- --------------------------------------------------------------------------------------------------------------
+    INF   Check the Warp Stall Sampling (All Samples) table for the top stall locations in your source based on         
+          sampling data. The Profiling Guide                                                                            
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-reference) provides more details    
+          on each stall reason.                                                                                         
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Instruction Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Avg. Executed Instructions Per Scheduler                   251.24
+    Executed Instructions                                     148,736
+    Avg. Issued Instructions Per Scheduler                     251.34
+    Issued Instructions                                       148,792
+    ---------------------------------------- ----------- ------------
+
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Launch Statistics
+    -------------------------------- ----------- ---------------
+    Metric Name                      Metric Unit    Metric Value
+    -------------------------------- ----------- ---------------
+    Block Size                                               128
+    Function Cache Configuration                 CachePreferNone
+    Grid Size                                                 56
+    Preferred Cluster Size                                     0
+    Registers Per Thread                                     136
+    Shared Memory Configuration Size                     200,704
+    Driver Shared Memory Per Block                         1,024
+    Dynamic Shared Memory Per Block                      184,448
+    Static Shared Memory Per Block                             0
+    # SMs                                                    148
+    Stack Size                                             1,024
+    Threads                                                7,168
+    # TPCs                                                    74
+    Enabled TPC IDs                                          all
+    Uses Green Context                                         0
+    Waves Per SM                                            0.38
+    -------------------------------- ----------- ---------------
+
+    OPT   Estimated Speedup: 62.16%                                                                                     
+          The grid for this launch is configured to execute only 56 blocks, which is less than the GPU's 148            
+          multiprocessors. This can underutilize some multiprocessors. If you do not intend to execute this kernel      
+          concurrently with other workloads, consider reducing the block size to have at least one block per            
+          multiprocessor or increase the size of the grid to fully utilize the available hardware resources. See the    
+          Hardware Model (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-hw-model)            
+          description for more details on launch configurations.                                                        
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           32
+    Block Limit Registers                 block            3
+    Block Limit Shared Mem                block            1
+    Block Limit Warps                     block           16
+    Theoretical Active Warps per SM        warp            4
+    Theoretical Occupancy                               6.25
+    Achieved Occupancy                                  6.21
+    Achieved Active Warps Per SM                        3.97
+    ------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 78.78%                                                                                     
+          The 1.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 16. This kernel's theoretical occupancy (6.2%) is limited by the required amount of       
+          shared memory.                                                                                                
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU and Memory Workload Distribution
+    -------------------------------- ----------- ------------
+    Metric Name                      Metric Unit Metric Value
+    -------------------------------- ----------- ------------
+    Average DRAM Active Cycles                       4,112.88
+    Total DRAM Elapsed Cycles                      13,526,528
+    Average L1 Active Cycles                        19,402.13
+    Total L1 Elapsed Cycles                         8,953,884
+    Average L2 Active Cycles                        54,321.23
+    Total L2 Elapsed Cycles                        11,246,724
+    Average MC Channel Active Cycles                  (!) n/a
+    Total MC Channel Elapsed Cycles                   (!) n/a
+    Average SM Active Cycles                        19,402.13
+    Total SM Elapsed Cycles                         8,953,884
+    Average SMSP Active Cycles                      19,323.45
+    Total SMSP Elapsed Cycles                      35,815,536
+    -------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 20.87%                                                                                     
+          One or more SMs have a much lower number of active cycles than the average number of active cycles. Maximum   
+          instance value is 65.09% above the average, while the minimum instance value is 100.00% below the average.    
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Estimated Speedup: 20.96%                                                                                     
+          One or more SMSPs have a much lower number of active cycles than the average number of active cycles. Maximum 
+          instance value is 65.61% above the average, while the minimum instance value is 100.00% below the average.    
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Estimated Speedup: 20.87%                                                                                     
+          One or more L1 Slices have a much lower number of active cycles than the average number of active cycles.     
+          Maximum instance value is 65.09% above the average, while the minimum instance value is 100.00% below the     
+          average.                                                                                                      
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio                     0.04
+    Branch Instructions                          5,544
+    Branch Efficiency                               99
+    Avg. Divergent Branches                       0.09
+    ------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 83.32%                                                                                     
+          This kernel has uncoalesced global accesses resulting in a total of 860160 excessive sectors (94% of the      
+          total 917504 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source         
+          locations. The CUDA Programming Guide                                                                         
+          (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional      
+          information on reducing uncoalesced device memory accesses.                                                   
+
+[1395582] python3.10@127.0.0.1
+  kernel_cutlass_kernel_TiledMMA_ThrLayoutVMNK11110000_PermutationMNK____MMAAtom_ThrID10_ShapeMNK12812864_TVLayoutA1128641281128_TVLayoutB1128641281128_TVLayoutC11281281281128_CopyAtom_ThrI_0 (1, 56, 1)x(128, 1, 1), Context 1, Stream 7, Device 0, CC 10.0
+
+    NVTX Push/Pop Stack for Thread 1395582:
+     <default domain>
+        <0,custom_kernel>
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ----------------
+    Metric Name             Metric Unit     Metric Value
+    ----------------------- ----------- ----------------
+    DRAM Frequency                      3,992,477,289.93
+    SM Frequency                        1,129,567,148.47
+    Elapsed Cycles                                96,466
+    Memory Throughput                              20.08
+    DRAM Throughput                                12.12
+    Duration                                      84,544
+    L1/TEX Cache Throughput                        59.74
+    L2 Cache Throughput                            14.32
+    SM Active Cycles                           31,782.82
+    Compute (SM) Throughput                         9.62
+    ----------------------- ----------- ----------------
+
+    OPT   This kernel grid is too small to fill the available resources on this device, resulting in only 0.4 full      
+          waves across all SMs. Look at Launch Statistics for more details.                                             
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU Speed Of Light Roofline Chart
+    INF   The ratio of peak float (FP32) to double (FP64) performance on this device is 2:1. The workload achieved 0%   
+          of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide           
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline      
+          analysis.                                                                                                     
+
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Compute Workload Analysis
+    -------------------- ----------- ------------
+    Metric Name          Metric Unit Metric Value
+    -------------------- ----------- ------------
+    Executed Ipc Active                      0.11
+    Executed Ipc Elapsed                     0.04
+    Issue Slots Busy                         0.92
+    Issued Ipc Active                        0.11
+    SM Busy                                  9.62
+    -------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 90.38%                                                                                     
+          All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps 
+          per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.             
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis
+    -------------------------------------- ----------- ------------------
+    Metric Name                            Metric Unit       Metric Value
+    -------------------------------------- ----------- ------------------
+    Local Memory Spilling Requests                                      0
+    Local Memory Spilling Request Overhead                              0
+    Memory Throughput                                  805,744,133,232.40
+    Mem Busy                                                        13.35
+    Max Bandwidth                                                   20.08
+    L1/TEX Hit Rate                                                 98.44
+    L2 Compression Success Rate                                         0
+    L2 Compression Ratio                                                0
+    L2 Compression Input Sectors                                  918,698
+    L2 Hit Rate                                                     30.80
+    Mem Pipes Busy                                                   8.39
+    -------------------------------------- ----------- ------------------
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis Chart
+    OPT   Estimated Speedup: 8.615%                                                                                     
+          Out of the 29398336.0 bytes sent to the L2 Compression unit only 0.00% were successfully compressed. To       
+          increase this success rate, consider marking only those memory regions as compressible that contain the most  
+          zero values and/or expose the most homogeneous values.                                                        
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis Tables
+    OPT   Estimated Speedup: 18.83%                                                                                     
+          The memory access pattern for global stores to L1TEX might not be optimal. On average, only 2.0 of the 32     
+          bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between   
+          threads. Check the Source Counters section for uncoalesced global stores.                                     
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Scheduler Statistics
+    ---------------------------- ----------- ------------
+    Metric Name                  Metric Unit Metric Value
+    ---------------------------- ----------- ------------
+    One or More Eligible                             2.75
+    Issued Warp Per Scheduler                        0.03
+    No Eligible                                     97.25
+    Active Warps Per Scheduler                       1.00
+    Eligible Warps Per Scheduler                     0.03
+    ---------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 79.92%                                                                                     
+          Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only    
+          issues an instruction every 36.4 cycles. This might leave hardware resources underutilized and may lead to    
+          less optimal performance. Out of the maximum of 16 warps per scheduler, this workload allocates an average    
+          of 1.00 active warps per scheduler, but only an average of 0.03 warps were eligible per cycle. Eligible       
+          warps are the subset of active warps that are ready to issue their next instruction. Every cycle with no      
+          eligible warp results in no instruction being issued and the issue slot remains unused. To increase the       
+          number of eligible warps, avoid possible load imbalances due to highly different execution durations per      
+          warp. Reducing stalls indicated on the Warp State Statistics and Source Counters sections can help, too.      
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Warp State Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Warp Cycles Per Issued Instruction                          36.43
+    Warp Cycles Per Executed Instruction                        36.47
+    Avg. Active Threads Per Warp                                31.91
+    Avg. Not Predicated Off Threads Per Warp                    30.78
+    ---------------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 75.38%                                                                                     
+          On average, each warp of this workload spends 27.5 cycles being stalled waiting for a scoreboard dependency   
+          on a L1TEX (local, global, surface, texture) operation. Find the instruction producing the data being waited  
+          upon to identify the culprit. To reduce the number of cycles waiting on L1TEX data accesses verify the        
+          memory access patterns are optimal for the target architecture, attempt to increase cache hit rates by        
+          increasing data locality (coalescing), or by changing the cache configuration. Consider moving frequently     
+          used data to shared memory. This stall type represents about 75.4% of the total average of 36.4 cycles        
+          between issuing two instructions.                                                                             
+    ----- --------------------------------------------------------------------------------------------------------------
+    INF   Check the Warp Stall Sampling (All Samples) table for the top stall locations in your source based on         
+          sampling data. The Profiling Guide                                                                            
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-reference) provides more details    
+          on each stall reason.                                                                                         
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Instruction Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Avg. Executed Instructions Per Scheduler                   870.55
+    Executed Instructions                                     515,368
+    Avg. Issued Instructions Per Scheduler                     871.50
+    Issued Instructions                                       515,928
+    ---------------------------------------- ----------- ------------
+
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Launch Statistics
+    -------------------------------- ----------- ---------------
+    Metric Name                      Metric Unit    Metric Value
+    -------------------------------- ----------- ---------------
+    Block Size                                               128
+    Function Cache Configuration                 CachePreferNone
+    Grid Size                                                 56
+    Preferred Cluster Size                                     0
+    Registers Per Thread                                     136
+    Shared Memory Configuration Size                     200,704
+    Driver Shared Memory Per Block                         1,024
+    Dynamic Shared Memory Per Block                      184,448
+    Static Shared Memory Per Block                             0
+    # SMs                                                    148
+    Stack Size                                             1,024
+    Threads                                                7,168
+    # TPCs                                                    74
+    Enabled TPC IDs                                          all
+    Uses Green Context                                         0
+    Waves Per SM                                            0.38
+    -------------------------------- ----------- ---------------
+
+    OPT   Estimated Speedup: 62.16%                                                                                     
+          The grid for this launch is configured to execute only 56 blocks, which is less than the GPU's 148            
+          multiprocessors. This can underutilize some multiprocessors. If you do not intend to execute this kernel      
+          concurrently with other workloads, consider reducing the block size to have at least one block per            
+          multiprocessor or increase the size of the grid to fully utilize the available hardware resources. See the    
+          Hardware Model (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-hw-model)            
+          description for more details on launch configurations.                                                        
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           32
+    Block Limit Registers                 block            3
+    Block Limit Shared Mem                block            1
+    Block Limit Warps                     block           16
+    Theoretical Active Warps per SM        warp            4
+    Theoretical Occupancy                               6.25
+    Achieved Occupancy                                  6.24
+    Achieved Active Warps Per SM                        4.00
+    ------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 79.92%                                                                                     
+          The 1.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 16. This kernel's theoretical occupancy (6.2%) is limited by the required amount of       
+          shared memory.                                                                                                
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU and Memory Workload Distribution
+    -------------------------------- ----------- ------------
+    Metric Name                      Metric Unit Metric Value
+    -------------------------------- ----------- ------------
+    Average DRAM Active Cycles                      33,262.12
+    Total DRAM Elapsed Cycles                      21,602,560
+    Average L1 Active Cycles                        31,782.82
+    Total L1 Elapsed Cycles                        13,992,478
+    Average L2 Active Cycles                        88,807.38
+    Total L2 Elapsed Cycles                        17,952,420
+    Average MC Channel Active Cycles                  (!) n/a
+    Total MC Channel Elapsed Cycles                   (!) n/a
+    Average SM Active Cycles                        31,782.82
+    Total SM Elapsed Cycles                        13,992,478
+    Average SMSP Active Cycles                      31,709.30
+    Total SMSP Elapsed Cycles                      55,969,912
+    -------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 21.52%                                                                                     
+          One or more SMs have a much lower number of active cycles than the average number of active cycles. Maximum   
+          instance value is 64.02% above the average, while the minimum instance value is 100.00% below the average.    
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Estimated Speedup: 21.69%                                                                                     
+          One or more SMSPs have a much lower number of active cycles than the average number of active cycles. Maximum 
+          instance value is 64.68% above the average, while the minimum instance value is 100.00% below the average.    
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Estimated Speedup: 21.52%                                                                                     
+          One or more L1 Slices have a much lower number of active cycles than the average number of active cycles.     
+          Maximum instance value is 64.02% above the average, while the minimum instance value is 100.00% below the     
+          average.                                                                                                      
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio                     0.04
+    Branch Instructions                         19,602
+    Branch Efficiency                            99.83
+    Avg. Divergent Branches                       0.09
+    ------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 85.33%                                                                                     
+          This kernel has uncoalesced global accesses resulting in a total of 860160 excessive sectors (94% of the      
+          total 917504 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source         
+          locations. The CUDA Programming Guide                                                                         
+          (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional      
+          information on reducing uncoalesced device memory accesses.                                                   
+
+[1395749] python3.10@127.0.0.1
+  kernel_cutlass_kernel_TiledMMA_ThrLayoutVMNK11110000_PermutationMNK____MMAAtom_ThrID10_ShapeMNK12812864_TVLayoutA1128641281128_TVLayoutB1128641281128_TVLayoutC11281281281128_CopyAtom_ThrI_0 (1, 32, 1)x(128, 1, 1), Context 1, Stream 7, Device 0, CC 10.0
+
+    NVTX Push/Pop Stack for Thread 1395749:
+     <default domain>
+        <0,custom_kernel>
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU Speed Of Light Throughput
+    ----------------------- ----------- ----------------
+    Metric Name             Metric Unit     Metric Value
+    ----------------------- ----------- ----------------
+    DRAM Frequency                      3,992,470,805.16
+    SM Frequency                        1,138,857,944.07
+    Elapsed Cycles                                59,765
+    Memory Throughput                              14.23
+    DRAM Throughput                                 4.93
+    Duration                                      52,064
+    L1/TEX Cache Throughput                        74.09
+    L2 Cache Throughput                            11.19
+    SM Active Cycles                           11,526.73
+    Compute (SM) Throughput                         3.74
+    ----------------------- ----------- ----------------
+
+    OPT   This kernel grid is too small to fill the available resources on this device, resulting in only 0.2 full      
+          waves across all SMs. Look at Launch Statistics for more details.                                             
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU Speed Of Light Roofline Chart
+    INF   The ratio of peak float (FP32) to double (FP64) performance on this device is 2:1. The workload achieved 0%   
+          of this device's FP32 peak performance and 0% of its FP64 peak performance. See the Profiling Guide           
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#roofline) for more details on roofline      
+          analysis.                                                                                                     
+
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Compute Workload Analysis
+    -------------------- ----------- ------------
+    Metric Name          Metric Unit Metric Value
+    -------------------- ----------- ------------
+    Executed Ipc Active                      0.09
+    Executed Ipc Elapsed                     0.02
+    Issue Slots Busy                         0.45
+    Issued Ipc Active                        0.09
+    SM Busy                                  3.74
+    -------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 96.26%                                                                                     
+          All compute pipelines are under-utilized. Either this workload is very small or it doesn't issue enough warps 
+          per scheduler. Check the Launch Statistics and Scheduler Statistics sections for further details.             
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis
+    -------------------------------------- ----------- ------------------
+    Metric Name                            Metric Unit       Metric Value
+    -------------------------------------- ----------- ------------------
+    Local Memory Spilling Requests                                      0
+    Local Memory Spilling Request Overhead                              0
+    Memory Throughput                                  327,468,961,278.43
+    Mem Busy                                                         9.89
+    Max Bandwidth                                                   14.23
+    L1/TEX Hit Rate                                                 98.44
+    L2 Compression Success Rate                                         0
+    L2 Compression Ratio                                                0
+    L2 Compression Input Sectors                                  525,813
+    L2 Hit Rate                                                     39.68
+    Mem Pipes Busy                                                   3.28
+    -------------------------------------- ----------- ------------------
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis Chart
+    OPT   Estimated Speedup: 3.032%                                                                                     
+          Out of the 16826016.0 bytes sent to the L2 Compression unit only 0.00% were successfully compressed. To       
+          increase this success rate, consider marking only those memory regions as compressible that contain the most  
+          zero values and/or expose the most homogeneous values.                                                        
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Memory Workload Analysis Tables
+    OPT   Estimated Speedup: 13.34%                                                                                     
+          The memory access pattern for global stores to L1TEX might not be optimal. On average, only 2.0 of the 32     
+          bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between   
+          threads. Check the Source Counters section for uncoalesced global stores.                                     
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Scheduler Statistics
+    ---------------------------- ----------- ------------
+    Metric Name                  Metric Unit Metric Value
+    ---------------------------- ----------- ------------
+    One or More Eligible                             2.36
+    Issued Warp Per Scheduler                        0.02
+    No Eligible                                     97.64
+    Active Warps Per Scheduler                       1.00
+    Eligible Warps Per Scheduler                     0.02
+    ---------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 85.77%                                                                                     
+          Every scheduler is capable of issuing one instruction per cycle, but for this workload each scheduler only    
+          issues an instruction every 42.4 cycles. This might leave hardware resources underutilized and may lead to    
+          less optimal performance. Out of the maximum of 16 warps per scheduler, this workload allocates an average    
+          of 1.00 active warps per scheduler, which already limits the scheduler to less than a warp per instruction.   
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Warp State Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Warp Cycles Per Issued Instruction                          42.39
+    Warp Cycles Per Executed Instruction                        42.42
+    Avg. Active Threads Per Warp                                31.83
+    Avg. Not Predicated Off Threads Per Warp                    30.67
+    ---------------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 72.46%                                                                                     
+          On average, each warp of this workload spends 30.7 cycles being stalled waiting for a scoreboard dependency   
+          on a L1TEX (local, global, surface, texture) operation. Find the instruction producing the data being waited  
+          upon to identify the culprit. To reduce the number of cycles waiting on L1TEX data accesses verify the        
+          memory access patterns are optimal for the target architecture, attempt to increase cache hit rates by        
+          increasing data locality (coalescing), or by changing the cache configuration. Consider moving frequently     
+          used data to shared memory. This stall type represents about 72.5% of the total average of 42.4 cycles        
+          between issuing two instructions.                                                                             
+    ----- --------------------------------------------------------------------------------------------------------------
+    INF   Check the Warp Stall Sampling (All Samples) table for the top stall locations in your source based on         
+          sampling data. The Profiling Guide                                                                            
+          (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-reference) provides more details    
+          on each stall reason.                                                                                         
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Instruction Statistics
+    ---------------------------------------- ----------- ------------
+    Metric Name                              Metric Unit Metric Value
+    ---------------------------------------- ----------- ------------
+    Avg. Executed Instructions Per Scheduler                   270.43
+    Executed Instructions                                     160,096
+    Avg. Issued Instructions Per Scheduler                     270.65
+    Issued Instructions                                       160,224
+    ---------------------------------------- ----------- ------------
+
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Launch Statistics
+    -------------------------------- ----------- ---------------
+    Metric Name                      Metric Unit    Metric Value
+    -------------------------------- ----------- ---------------
+    Block Size                                               128
+    Function Cache Configuration                 CachePreferNone
+    Grid Size                                                 32
+    Preferred Cluster Size                                     0
+    Registers Per Thread                                     136
+    Shared Memory Configuration Size                     200,704
+    Driver Shared Memory Per Block                         1,024
+    Dynamic Shared Memory Per Block                      184,448
+    Static Shared Memory Per Block                             0
+    # SMs                                                    148
+    Stack Size                                             1,024
+    Threads                                                4,096
+    # TPCs                                                    74
+    Enabled TPC IDs                                          all
+    Uses Green Context                                         0
+    Waves Per SM                                            0.22
+    -------------------------------- ----------- ---------------
+
+    OPT   Estimated Speedup: 78.38%                                                                                     
+          The grid for this launch is configured to execute only 32 blocks, which is less than the GPU's 148            
+          multiprocessors. This can underutilize some multiprocessors. If you do not intend to execute this kernel      
+          concurrently with other workloads, consider reducing the block size to have at least one block per            
+          multiprocessor or increase the size of the grid to fully utilize the available hardware resources. See the    
+          Hardware Model (https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#metrics-hw-model)            
+          description for more details on launch configurations.                                                        
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Occupancy
+    ------------------------------- ----------- ------------
+    Metric Name                     Metric Unit Metric Value
+    ------------------------------- ----------- ------------
+    Block Limit SM                        block           32
+    Block Limit Registers                 block            3
+    Block Limit Shared Mem                block            1
+    Block Limit Warps                     block           16
+    Theoretical Active Warps per SM        warp            4
+    Theoretical Occupancy                               6.25
+    Achieved Occupancy                                  6.22
+    Achieved Active Warps Per SM                        3.98
+    ------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 85.77%                                                                                     
+          The 1.00 theoretical warps per scheduler this kernel can issue according to its occupancy are below the       
+          hardware maximum of 16. This kernel's theoretical occupancy (6.2%) is limited by the required amount of       
+          shared memory.                                                                                                
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: GPU and Memory Workload Distribution
+    -------------------------------- ----------- ------------
+    Metric Name                      Metric Unit Metric Value
+    -------------------------------- ----------- ------------
+    Average DRAM Active Cycles                       8,324.88
+    Total DRAM Elapsed Cycles                      13,303,296
+    Average L1 Active Cycles                        11,526.73
+    Total L1 Elapsed Cycles                         8,883,654
+    Average L2 Active Cycles                        53,670.54
+    Total L2 Elapsed Cycles                        11,057,112
+    Average MC Channel Active Cycles                  (!) n/a
+    Total MC Channel Elapsed Cycles                   (!) n/a
+    Average SM Active Cycles                        11,526.73
+    Total SM Elapsed Cycles                         8,883,654
+    Average SMSP Active Cycles                      11,474.38
+    Total SMSP Elapsed Cycles                      35,534,616
+    -------------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 15.09%                                                                                     
+          One or more SMs have a much lower number of active cycles than the average number of active cycles. Maximum   
+          instance value is 78.56% above the average, while the minimum instance value is 100.00% below the average.    
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Estimated Speedup: 15.03%                                                                                     
+          One or more SMSPs have a much lower number of active cycles than the average number of active cycles. Maximum 
+          instance value is 78.65% above the average, while the minimum instance value is 100.00% below the average.    
+    ----- --------------------------------------------------------------------------------------------------------------
+    OPT   Estimated Speedup: 15.09%                                                                                     
+          One or more L1 Slices have a much lower number of active cycles than the average number of active cycles.     
+          Maximum instance value is 78.56% above the average, while the minimum instance value is 100.00% below the     
+          average.                                                                                                      
+
+==WARNING== Failed to detect compute capability, assuming 50
+    Section: Source Counters
+    ------------------------- ----------- ------------
+    Metric Name               Metric Unit Metric Value
+    ------------------------- ----------- ------------
+    Branch Instructions Ratio                     0.04
+    Branch Instructions                          6,208
+    Branch Efficiency                            99.63
+    Avg. Divergent Branches                       0.05
+    ------------------------- ----------- ------------
+
+    OPT   Estimated Speedup: 83.73%                                                                                     
+          This kernel has uncoalesced global accesses resulting in a total of 491520 excessive sectors (94% of the      
+          total 524288 sectors). Check the L2 Theoretical Sectors Global Excessive table for the primary source         
+          locations. The CUDA Programming Guide                                                                         
+          (https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses) has additional      
+          information on reducing uncoalesced device memory accesses.                                                   
+
