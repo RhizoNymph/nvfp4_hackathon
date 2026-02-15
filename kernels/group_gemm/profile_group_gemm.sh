@@ -109,9 +109,14 @@ run_ncu() {
 
     ncu -o "$NCU_REP" \
         --log-file "$NCU_LOG" \
-        --set full \
+        --section ComputeWorkloadAnalysis \
+        --section MemoryWorkloadAnalysis \
+        --section Occupancy \
+        --section WarpStateStats \
+        --section LaunchStats \
         --kernel-name-base demangled \
         --kernel-name regex:"cutlass.*" \
+        --launch-skip 0 --launch-count 1 \
         uv run python3 profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$NCU_OUTPUT"
 
     echo ""
