@@ -10,3 +10,4 @@ uv init
 uv add nvidia-cutlass-dsl torch pyyaml
 cd group_gemm/
 chmod +x profile_group_gemm.sh
+sudo apt install nsight-compute-2025.4.1
