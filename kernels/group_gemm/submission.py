@@ -192,7 +192,7 @@ def kernel(
         producer_group=pipeline.CooperativeGroup(pipeline.Agent.Thread),
         consumer_group=pipeline.CooperativeGroup(
             pipeline.Agent.Thread,
-            64,
+            threads_per_cta,
         ),
     ).make_participants()
 
@@ -345,10 +345,7 @@ def kernel(
         tensormap_manager.fence_tensormap_update(tensormap_sfa_gmem_ptr)
         tensormap_manager.fence_tensormap_update(tensormap_sfb_gmem_ptr)
 
-    if warp_idx == EPILOG_WARPS[0]:
-        tmem.allocate(num_tmem_alloc_cols)
-
-    cute.arch.barrier()
+    tmem.allocate(num_tmem_alloc_cols)
     tmem.wait_for_alloc()
     acc_tmem_ptr = tmem.retrieve_ptr(cutlass.Float32)
     tCtAcc = cute.make_tensor(acc_tmem_ptr, tCtAcc_fake.layout)
@@ -607,64 +604,62 @@ def kernel(
 
         acc_empty.commit()
 
-    if warp_idx in EPILOG_WARPS:
-        op = tcgen05.Ld32x32bOp(tcgen05.Repetition.x128, tcgen05.Pack.NONE)
-        copy_atom_t2r = cute.make_copy_atom(op, cutlass.Float32)
-        tiled_copy_t2r = tcgen05.make_tmem_copy(copy_atom_t2r, tCtAcc[None,0,0])
-        thr_copy_t2r = tiled_copy_t2r.get_slice(tidx)
-        # (TmemCpy, NumTmemCpy)
-        tDtAcc = thr_copy_t2r.partition_S(tCtAcc[None,0,0])
-        # (TmemCpy, NumTmemCpy)
-        tDgC = thr_copy_t2r.partition_D(tCgC[None,0,0])
+    #
+    # Epilogue - all threads participate
+    #
+    op = tcgen05.Ld32x32bOp(tcgen05.Repetition.x128, tcgen05.Pack.NONE)
+    copy_atom_t2r = cute.make_copy_atom(op, cutlass.Float32)
+    tiled_copy_t2r = tcgen05.make_tmem_copy(copy_atom_t2r, tCtAcc[None,0,0])
+    thr_copy_t2r = tiled_copy_t2r.get_slice(tidx)
+    # (TmemCpy, NumTmemCpy)
+    tDtAcc = thr_copy_t2r.partition_S(tCtAcc[None,0,0])
+    # (TmemCpy, NumTmemCpy)
+    tDgC = thr_copy_t2r.partition_D(tCgC[None,0,0])
 
-        # (TmemCpy, NumTmemCpy)
-        tDrAcc = cute.make_rmem_tensor(tDgC.shape, cutlass.Float32)
-        # (TmemCpy, NumTmemCpy)
-        tDrC = cute.make_rmem_tensor(tDgC.shape, c_dtype)
+    # (TmemCpy, NumTmemCpy)
+    tDrAcc = cute.make_rmem_tensor(tDgC.shape, cutlass.Float32)
+    # (TmemCpy, NumTmemCpy)
+    tDrC = cute.make_rmem_tensor(tDgC.shape, c_dtype)
 
-        if warp_idx == EPILOG_WARPS[0]:
-            # Release TMEM allocation lock
-            tmem.relinquish_alloc_permit()
-        # Wait for accumulator buffer full
-        acc_full = acc_consumer.wait_and_advance()
+    # Release TMEM allocation lock
+    tmem.relinquish_alloc_permit()
+    # Wait for accumulator buffer full
+    acc_full = acc_consumer.wait_and_advance()
 
-        # Copy accumulator to register
-        cute.copy(tiled_copy_t2r, tDtAcc, tDrAcc)
-        acc_vec = tDrAcc.load()
-        tDrC.store(acc_vec.to(c_dtype))
+    # Copy accumulator to register
+    cute.copy(tiled_copy_t2r, tDtAcc, tDrAcc)
+    acc_vec = tDrAcc.load()
+    tDrC.store(acc_vec.to(c_dtype))
 
-        # STG Atom, just to ensure functionality
-        # For performance optimization, better to use Tma store operation to
-        # reduce address calculation and predicate calulation instructions
-        simt_atom = cute.make_copy_atom(
-            cute.nvgpu.CopyUniversalOp(), c_dtype, num_bits_per_copy=16
-        )
-        thread_layout = cute.make_layout(
-            (1, int(threads_per_cta // 2)), stride=((threads_per_cta // 2), 1))
-        value_layout = cute.make_layout((1, 1))
-        tiled_copy_r2g = cute.make_tiled_copy_tv(
-            simt_atom, thread_layout, value_layout
-        )
-        thr_copy_r2g = tiled_copy_r2g.get_slice(tidx)
-        cC = cute.make_identity_tensor(gC_mnl.shape)
-        # ((atom_v, rest_v), NumGmemCpy)
-        tDcC = thr_copy_r2g.partition_D(cC)
+    # STG Atom
+    simt_atom = cute.make_copy_atom(
+        cute.nvgpu.CopyUniversalOp(), c_dtype, num_bits_per_copy=16
+    )
+    thread_layout = cute.make_layout(
+        (1, threads_per_cta), stride=(threads_per_cta, 1))
+    value_layout = cute.make_layout((1, 1))
+    tiled_copy_r2g = cute.make_tiled_copy_tv(
+        simt_atom, thread_layout, value_layout
+    )
+    thr_copy_r2g = tiled_copy_r2g.get_slice(tidx)
+    cC = cute.make_identity_tensor(gC_mnl.shape)
+    # ((atom_v, rest_v), NumGmemCpy)
+    tDcC = thr_copy_r2g.partition_D(cC)
 
-        # ((atom_v, rest_v), NumGmemCpy)
-        tDpC = cute.make_rmem_tensor(tDrC.shape, cutlass.Boolean)
-        residue_m = mC_mnl.shape[0] - cutlass.Int32(coord_x) * mma_tiler_mnk[0]
-        residue_n = mC_mnl.shape[1] - cutlass.Int32(coord_y) * mma_tiler_mnk[1]
-        for i in range(cute.size(tDrC.shape)):
-            # Swap residue_m and residue_n to match the order of tDcC
-            tDpC[i] = cute.elem_less(tDcC[i], (residue_n, residue_m))
-        cute.copy(simt_atom, cute.flatten(tDrC), cute.flatten(tDgC), pred=cute.flatten(tDpC))
+    # ((atom_v, rest_v), NumGmemCpy)
+    tDpC = cute.make_rmem_tensor(tDrC.shape, cutlass.Boolean)
+    residue_m = mC_mnl.shape[0] - cutlass.Int32(coord_x) * mma_tiler_mnk[0]
+    residue_n = mC_mnl.shape[1] - cutlass.Int32(coord_y) * mma_tiler_mnk[1]
+    for i in range(cute.size(tDrC.shape)):
+        # Swap residue_m and residue_n to match the order of tDcC
+        tDpC[i] = cute.elem_less(tDcC[i], (residue_n, residue_m))
+    cute.copy(simt_atom, cute.flatten(tDrC), cute.flatten(tDgC), pred=cute.flatten(tDpC))
 
-        acc_full.release()
-    
+    acc_full.release()
+
     # Deallocate TMEM
     cute.arch.barrier()
-    if warp_idx == EPILOG_WARPS[0]:
-            cute.arch.dealloc_tmem(acc_tmem_ptr, num_tmem_alloc_cols)
+    tmem.free(acc_tmem_ptr, num_tmem_alloc_cols)
     pass
 
 
