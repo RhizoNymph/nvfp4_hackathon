@@ -299,24 +299,37 @@ def kernel(
         barrier_id=1,
         num_threads=threads_per_cta,
     )
+    # Barrier to sync tensormap init (MMA warp) with tensormap update (TMA warp)
+    tensormap_ab_init_barrier = pipeline.NamedBarrier(
+        barrier_id=2,
+        num_threads=64,  # MMA warp (32) + TMA warp (32)
+    )
     tmem = utils.TmemAllocator(
         storage.tmem_holding_buf,
         barrier_for_retrieve=tmem_alloc_barrier,
     )
 
+    # MMA warp initializes tensormaps (overlaps with tmem allocation by warp 0)
+    if warp_idx == MMA_WARP:
+        tensormap_manager.init_tensormap_from_atom(
+            tma_atom_a, tensormap_a_smem_ptr, MMA_WARP
+        )
+        tensormap_manager.init_tensormap_from_atom(
+            tma_atom_b, tensormap_b_smem_ptr, MMA_WARP
+        )
+        tensormap_manager.init_tensormap_from_atom(
+            tma_atom_sfa, tensormap_sfa_smem_ptr, MMA_WARP
+        )
+        tensormap_manager.init_tensormap_from_atom(
+            tma_atom_sfb, tensormap_sfb_smem_ptr, MMA_WARP
+        )
+
+    # Sync MMA + TMA warps: ensure tensormap init is complete before TMA updates
+    if warp_idx == MMA_WARP or warp_idx == TMA_WARP:
+        tensormap_ab_init_barrier.arrive_and_wait()
+
+    # TMA warp updates tensormaps with real tensor shapes and fences
     if warp_idx == TMA_WARP:
-        tensormap_manager.init_tensormap_from_atom(
-            tma_atom_a, tensormap_a_smem_ptr, TMA_WARP
-        )
-        tensormap_manager.init_tensormap_from_atom(
-            tma_atom_b, tensormap_b_smem_ptr, TMA_WARP
-        )
-        tensormap_manager.init_tensormap_from_atom(
-            tma_atom_sfa, tensormap_sfa_smem_ptr, TMA_WARP
-        )
-        tensormap_manager.init_tensormap_from_atom(
-            tma_atom_sfb, tensormap_sfb_smem_ptr, TMA_WARP
-        )
         tensormap_manager.update_tensormap(
             (
                 real_tensor_a,
