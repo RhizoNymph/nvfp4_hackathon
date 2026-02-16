@@ -37,7 +37,7 @@ sf_vec_size = 16
 threads_per_cta = 128  
 # Stage numbers of shared memory and tmem
 num_acc_stage = 1
-num_ab_stage = 1
+num_ab_stage = 2
 # Total number of columns in tmem
 num_tmem_alloc_cols = 512
 
@@ -178,7 +178,7 @@ def kernel(
 
     # Initialize mainloop ab_pipeline, acc_pipeline and their states
     ab_pipeline_producer_group = pipeline.CooperativeGroup(pipeline.Agent.Thread)
-    ab_pipeline_consumer_group = pipeline.CooperativeGroup(pipeline.Agent.Thread, 32)
+    ab_pipeline_consumer_group = pipeline.CooperativeGroup(pipeline.Agent.Thread, 1)
     ab_producer, ab_consumer = pipeline.PipelineTmaUmma.create(
         barrier_storage=storage.ab_mbar_ptr.data_ptr(),
         num_stages=num_ab_stage,
@@ -640,7 +640,7 @@ def kernel(
             cute.nvgpu.CopyUniversalOp(), c_dtype, num_bits_per_copy=16
         )
         thread_layout = cute.make_layout(
-            (1, threads_per_cta), stride=(threads_per_cta, 1))
+            (1, int(threads_per_cta // 2)), stride=((threads_per_cta // 2), 1))
         value_layout = cute.make_layout((1, 1))
         tiled_copy_r2g = cute.make_tiled_copy_tv(
             simt_atom, thread_layout, value_layout
