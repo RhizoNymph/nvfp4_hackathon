@@ -85,6 +85,7 @@ run_nsys() {
         --capture-range-end=stop \
         --force-overwrite true \
         --stats true \
+        --trace-fork-before-exec=true \
         uv run python3 profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$NSYS_OUTPUT"
 
     echo ""
@@ -115,6 +116,7 @@ run_ncu() {
         --launch-count 1 \
         --profile-from-start off \
         --nvtx --nvtx-include "nvfp4_group_gemm_*" \
+        --target-processes all \
         uv run python3 profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$NCU_OUTPUT"
 
     echo ""
