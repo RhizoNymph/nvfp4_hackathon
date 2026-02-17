@@ -55,6 +55,13 @@ if [[ "$PROFILER" != "ncu" && "$PROFILER" != "nsys" && "$PROFILER" != "both" ]];
     exit 1
 fi
 
+# Ensure uv venv is set up, then resolve the python path directly
+# This avoids wrapping profilers around "uv run" which spawns child processes
+# that ncu/nsys can't follow properly.
+uv sync --quiet 2>/dev/null || true
+PYTHON="$(uv run which python3)"
+echo "Resolved Python: $PYTHON"
+
 PREFIX="${KERNEL_TYPE}_case${CASE}"
 
 echo "============================================================"
@@ -64,6 +71,7 @@ echo "  Kernel type : $KERNEL_TYPE"
 echo "  Case        : $CASE"
 echo "  Profiler    : $PROFILER"
 echo "  Output dir  : $OUTPUT_DIR"
+echo "  Python      : $PYTHON"
 echo ""
 
 # --- Nsight Systems ---
@@ -80,30 +88,32 @@ run_nsys() {
 
     nsys profile \
         -o "$NSYS_REP" \
-        -t cuda,nvtx,osrt \
-        --capture-range=cudaProfilerApi \
-        --capture-range-end=stop \
+        -t cuda,nvtx \
         --force-overwrite true \
-        --stats true \
-        --trace-fork-before-exec=true \
-        uv run python3 profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$NSYS_OUTPUT"
+        --stats false \
+        "$PYTHON" profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$NSYS_OUTPUT"
 
     echo ""
-    echo "Nsight Systems profiling complete!"
-    echo "  Open ${NSYS_REP}.nsys-rep in Nsight Systems GUI for timeline analysis"
+    if [[ -f "${NSYS_REP}.nsys-rep" ]]; then
+        echo "Nsight Systems profiling complete!"
+        echo "  Open ${NSYS_REP}.nsys-rep in Nsight Systems GUI for timeline analysis"
+    else
+        echo "WARNING: ${NSYS_REP}.nsys-rep was not generated!"
+        echo "  Check the output above for errors."
+    fi
     echo ""
 }
 
 # --- Nsight Compute ---
 run_ncu() {
     local NCU_LOG="$OUTPUT_DIR/${PREFIX}_ncu_${TIMESTAMP}.txt"
-    local NCU_REP="$OUTPUT_DIR/${PREFIX}_ncu_${TIMESTAMP}.ncu-rep"
+    local NCU_REP="$OUTPUT_DIR/${PREFIX}_ncu_${TIMESTAMP}"
     local NCU_OUTPUT="$OUTPUT_DIR/${PREFIX}_ncu_output_${TIMESTAMP}.txt"
 
     echo "------------------------------------------------------------"
     echo "Running Nsight Compute..."
     echo "  Log    : $NCU_LOG"
-    echo "  Report : $NCU_REP"
+    echo "  Report : ${NCU_REP}.ncu-rep"
     echo "  Output : $NCU_OUTPUT"
     echo "------------------------------------------------------------"
     echo ""
@@ -114,15 +124,17 @@ run_ncu() {
         --kernel-name-base demangled \
         --kernel-name regex:"cutlass.*" \
         --launch-count 1 \
-        --profile-from-start off \
-        --nvtx --nvtx-include "nvfp4_group_gemm_*" \
-        --target-processes all \
-        uv run python3 profile_group_gemm.py $EXTRA_ARGS 2>&1 | tee "$NCU_OUTPUT"
+        "$PYTHON" profile_group_gemm.py --no-warmup $EXTRA_ARGS 2>&1 | tee "$NCU_OUTPUT"
 
     echo ""
-    echo "Nsight Compute profiling complete!"
-    echo "  Check $NCU_LOG for metrics"
-    echo "  Open $NCU_REP in Nsight Compute GUI for interactive analysis"
+    if [[ -f "${NCU_REP}.ncu-rep" ]]; then
+        echo "Nsight Compute profiling complete!"
+        echo "  Check $NCU_LOG for metrics"
+        echo "  Open ${NCU_REP}.ncu-rep in Nsight Compute GUI for interactive analysis"
+    else
+        echo "WARNING: ${NCU_REP}.ncu-rep was not generated!"
+        echo "  Check the output above for errors."
+    fi
     echo ""
 }
 
