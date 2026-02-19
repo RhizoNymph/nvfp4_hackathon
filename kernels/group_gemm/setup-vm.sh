@@ -11,3 +11,5 @@ uv add nvidia-cutlass-dsl torch pyyaml
 cd group_gemm/
 chmod +x profile_group_gemm.sh
 sudo apt install nsight-compute-2025.4.1
+sudo apt install nsight-systems
+export PATH=/opt/nvidia/nsight-compute/2025.4.1/:$PATH  
